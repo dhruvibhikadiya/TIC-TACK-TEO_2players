@@ -1,0 +1,97 @@
+import simplegui
+W=300
+H=300
+lst=[['','',''],['','',''],['','','']]
+player_1=''
+player_2=''
+turn='X'
+won=False
+
+def draw(canvas):
+    canvas.draw_line([W/3,0],[W/3,H],2,'black')
+    canvas.draw_line([2*W/3,0],[2*W/3,H],2,'black')
+    canvas.draw_line([0,H/3],[W,H/3],2,'black')
+    canvas.draw_line([0,2*H/3],[W,2*H/3],2,'black')
+    for r in range(0,3):
+        for c in range(0,3):
+            if lst[r][c]=='X':
+                canvas.draw_text(lst[r][c],[c*(W//3)+20,r*(H//3)+80],80,'red')
+            if lst[r][c]=='O':
+                canvas.draw_text(lst[r][c],[c*(W//3)+20,r*(H//3)+80],80,'white')
+               
+    
+def pl1(p):
+    global player_1
+    player_1=p
+    
+def pl2(p):
+    global player_2
+    player_2=p
+    
+def reset():
+    global lst,player_1,player_2,info,won,turn
+    lst=[['','',''],['','',''],['','','']]
+    turn='X'
+    won=False
+    info.set_text(player_1+"'s turn: "+ turn)
+    
+def click(pos):
+    global won,info
+    if won==False:
+        if pos[0]%(W//3)!=0 and pos[1]%(H//3):
+            r=pos[1]//(W//3)
+            c=pos[0]//(H//3)
+            if lst[r][c]=='':
+                lst[r][c]=turn
+                if check_win():
+                    won='true'
+                    info.set_text(p+ turn + "wins!")
+                else:
+                    for i in range(3):
+                        if '' in lst[i]:
+                            switch_turn()
+                            break
+                        else:
+                            info.set_text("its draw !")
+                            
+def switch_turn():
+    global turn,info,p
+    if turn=='X':
+        p=player_2
+        turn='O'
+    else:
+        turn='X'
+        p=player_1
+    info.set_text(p+"'s turn:" + turn)
+    
+def check_win():
+    for a in range(3):
+        if lst[a][0]!='' and lst[a][0]==lst[a][1]==lst[a][2]:
+            return True
+    for b in range(3):
+        if lst[0][b]!='' and lst[0][b]==lst[1][b]==lst[2][b]:
+            return True
+    if lst[0][0]==lst[1][1]==lst[2][2] and lst[0][0]!='':
+        return True
+    elif lst[0][2]==lst[1][1]==lst[2][0] and lst[0][2]!='':
+        return True
+    else:
+        return False
+                                 
+                             
+            
+    
+    
+    
+
+
+frame=simplegui.create_frame('dhruvi',W,H)
+frame.start()
+
+frame.set_canvas_background('gray')
+frame.set_mouseclick_handler(click)
+frame.set_draw_handler(draw)
+frame.add_input('player-1',pl1,150)
+frame.add_input('player-2',pl2,150)
+info=frame.add_label('enter name of player &click reset button to play game')
+frame.add_button('reset',reset)
